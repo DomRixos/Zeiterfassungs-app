@@ -194,7 +194,7 @@ st.markdown("""
 </style>
 
 <div class="wm-header">
-  <div class="wm-logo">WALTER MEIER <span class="wm-tagline">(Fertigungslösungen AG)</span></div>
+  <div class="wm-logo">WALTER MEIER <span class="wm-tagline">(Fertigungslösungen)</span> AG</div>
   <div class="wm-subtitle">Zeiterfassung</div>
 </div>
 """, unsafe_allow_html=True)
