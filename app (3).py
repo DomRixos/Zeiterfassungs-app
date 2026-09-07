@@ -39,7 +39,7 @@ st.markdown("""
         font-weight: 400;
         letter-spacing: 0.5px;
         opacity: 0.85;
-        margin-top: 1px;
+        display: inline;
     }
     .wm-subtitle {
         color: #999;
@@ -194,10 +194,7 @@ st.markdown("""
 </style>
 
 <div class="wm-header">
-  <div>
-    <div class="wm-logo">WALTER MEIER</div>
-    <div class="wm-tagline">Fertigungslösungen AG</div>
-  </div>
+  <div class="wm-logo">WALTER MEIER <span class="wm-tagline">(Fertigungslösungen AG)</span></div>
   <div class="wm-subtitle">Zeiterfassung</div>
 </div>
 """, unsafe_allow_html=True)
