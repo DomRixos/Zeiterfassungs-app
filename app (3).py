@@ -425,7 +425,7 @@ with tab_overview:
                 proj_sum[["projekt","Stunden (formatiert)","Anteil %"]].rename(columns={"projekt":"Projekt"}),
                 use_container_width=True, hide_index=True
             )
-            st.bar_chart(proj_sum.set_index("projekt")["Stunden"])
+            st.bar_chart(proj_sum.set_index("projekt")["Stunden"], color="#C4D600")
 
             st.markdown("---")
 
