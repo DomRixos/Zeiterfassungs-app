@@ -92,14 +92,22 @@ st.markdown("""
     }
 
     /* Tabs */
-    div[data-testid="stTabs"] button[role="tab"] {
+    div[data-testid="stTabs"] button[role="tab"],
+    div[data-testid="stTabs"] button[role="tab"] p,
+    div[data-testid="stTabs"] button[role="tab"] div {
         color: #C4D600 !important;
-        font-weight: 500;
+        font-weight: 500 !important;
     }
-    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"],
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p,
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] div {
         color: #C4D600 !important;
         border-bottom-color: #C4D600 !important;
         font-weight: 700 !important;
+    }
+    /* Streamlit wraps tab text in a span */
+    div[data-testid="stTabs"] button[role="tab"] span {
+        color: #C4D600 !important;
     }
 
     /* Metrics */
