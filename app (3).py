@@ -52,13 +52,9 @@ st.markdown("""
     h1 { color: #1a1a1a !important; font-weight: 800 !important; }
     h2, h3 { color: #1a1a1a !important; font-weight: 700 !important; }
 
-    /* Primary button → WM Lime Green */
-    div.stButton > button[kind="primary"],
-    div.stButton > button[data-testid="baseButton-primary"],
-    div.stFormSubmitButton > button[kind="primary"],
-    div.stFormSubmitButton > button[data-testid="baseButton-primary"],
-    button[kind="primary"],
-    button[data-testid="baseButton-primary"] {
+    /* Alle Buttons → WM Lime Green */
+    div[data-testid="stButton"] button,
+    div[data-testid="stFormSubmitButton"] button {
         background-color: #C4D600 !important;
         color: #1a1a1a !important;
         border: none !important;
@@ -66,24 +62,10 @@ st.markdown("""
         border-radius: 4px !important;
         letter-spacing: 0.3px;
     }
-    div.stButton > button[kind="primary"]:hover,
-    div.stButton > button[data-testid="baseButton-primary"]:hover,
-    div.stFormSubmitButton > button[kind="primary"]:hover,
-    div.stFormSubmitButton > button[data-testid="baseButton-primary"]:hover,
-    button[data-testid="baseButton-primary"]:hover {
+    div[data-testid="stButton"] button:hover,
+    div[data-testid="stFormSubmitButton"] button:hover {
         background-color: #a8b800 !important;
         color: #1a1a1a !important;
-    }
-
-    /* Secondary buttons */
-    div.stButton > button[kind="secondary"] {
-        border-color: #C4D600 !important;
-        color: #1a1a1a !important;
-        border-radius: 4px !important;
-        font-weight: 500 !important;
-    }
-    div.stButton > button[kind="secondary"]:hover {
-        background-color: #f5f9e0 !important;
     }
 
     /* Download button */
