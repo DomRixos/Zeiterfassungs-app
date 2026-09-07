@@ -92,13 +92,14 @@ st.markdown("""
     }
 
     /* Tabs */
+    div[data-testid="stTabs"] button[role="tab"] {
+        color: #C4D600 !important;
+        font-weight: 500;
+    }
     div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] {
-        color: #1a1a1a !important;
+        color: #C4D600 !important;
         border-bottom-color: #C4D600 !important;
         font-weight: 700 !important;
-    }
-    div[data-testid="stTabs"] button[role="tab"] {
-        font-weight: 500;
     }
 
     /* Metrics */
