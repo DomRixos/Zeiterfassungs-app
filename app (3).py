@@ -4,7 +4,7 @@ import os
 import json
 from datetime import date, datetime, timedelta
 
-st.set_page_config(page_title="Walter Meier (Fertigungslösungen) AG – Zeiterfassung", page_icon="⏱️", layout="centered")
+st.set_page_config(page_title="Walter Meier – Zeiterfassung", page_icon=None, layout="centered")
 
 # Walter Meier Corporate Design
 # Primärfarben: Schwarz #1a1a1a, Lime-Grün #C4D600, Akzentgrün #8BBD00
@@ -32,6 +32,14 @@ st.markdown("""
         color: #C4D600;
         letter-spacing: 1px;
         text-transform: uppercase;
+    }
+    .wm-tagline {
+        color: #C4D600;
+        font-size: 0.72rem;
+        font-weight: 400;
+        letter-spacing: 0.5px;
+        opacity: 0.85;
+        margin-top: 1px;
     }
     .wm-subtitle {
         color: #999;
@@ -184,10 +192,14 @@ st.markdown("""
         color: #aaa;
     }
     .wm-footer strong { color: #1a1a1a; }
+    .wm-footer em { color: #888; font-style: normal; font-size: 0.7rem; }
 </style>
 
 <div class="wm-header">
-  <div class="wm-logo">WALTER MEIER</div>
+  <div>
+    <div class="wm-logo">WALTER MEIER</div>
+    <div class="wm-tagline">Fertigungslösungen AG</div>
+  </div>
   <div class="wm-subtitle">Zeiterfassung</div>
 </div>
 """, unsafe_allow_html=True)
@@ -242,7 +254,7 @@ if "person" not in st.session_state:
 st.title("Zeiterfassung")
 
 # Person eingeben (persistent in session)
-with st.expander("👤 Wer bist du?" if not st.session_state.person else f"👤 Eingeloggt als: **{st.session_state.person}**", expanded=not st.session_state.person):
+with st.expander("[ > ] Wer bist du?" if not st.session_state.person else f"[ > ] Eingeloggt als: **{st.session_state.person}**", expanded=not st.session_state.person):
     name_input = st.text_input("Dein Name", value=st.session_state.person, placeholder="Max Mustermann")
     if st.button("Bestätigen"):
         if name_input.strip():
@@ -260,10 +272,10 @@ projects = load_projects()
 
 # ── Tabs ──────────────────────────────────────────────────────────────────────
 tab_new, tab_my, tab_overview, tab_projects = st.tabs([
-    "➕ Zeit erfassen",
-    "📋 Meine Einträge",
-    "📊 Auswertung",
-    "🗂️ Projekte"
+    "+ Zeit erfassen",
+    "= Meine Einträge",
+    "~ Auswertung",
+    "# Projekte"
 ])
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -284,7 +296,7 @@ with tab_new:
 
         notiz = st.text_input("Notiz (optional)", placeholder="Was habe ich gemacht?")
 
-        submitted = st.form_submit_button("⏱️ Zeit speichern", type="primary", use_container_width=True)
+        submitted = st.form_submit_button("[ + ] Zeit speichern", type="primary", use_container_width=True)
 
     if submitted:
         start_str = f"{start_h:02d}:{start_m:02d}"
@@ -293,7 +305,7 @@ with tab_new:
         ende_dt   = datetime.strptime(ende_str,  "%H:%M")
 
         if ende_dt <= start_dt:
-            st.error("⚠️ Endzeit muss nach der Startzeit liegen.")
+            st.error("Endzeit muss nach der Startzeit liegen.")
         else:
             diff = (ende_dt - start_dt).seconds / 3600
             df = load_entries()
@@ -310,7 +322,7 @@ with tab_new:
             }
             df = pd.concat([df, pd.DataFrame([new_row])], ignore_index=True)
             save_entries(df)
-            st.success(f"✅ {float_to_hhmm(diff)} auf **{projekt}** gespeichert!")
+            st.success(f"[ok] {float_to_hhmm(diff)} auf **{projekt}** gespeichert!")
 
 # ══════════════════════════════════════════════════════════════════════════════
 # TAB 2 – MEINE EINTRÄGE
@@ -321,7 +333,7 @@ with tab_my:
     mine = df[df["person"] == person].copy()
 
     if mine.empty:
-        st.info("Noch keine Einträge. Erfasse deine erste Zeit im Tab '➕ Zeit erfassen'.")
+        st.info("Noch keine Einträge. Erfasse deine erste Zeit im Tab '+ Zeit erfassen'.")
     else:
         mine["stunden_num"] = pd.to_numeric(mine["stunden"], errors="coerce").fillna(0)
         total = mine["stunden_num"].sum()
@@ -346,7 +358,7 @@ with tab_my:
                     st.write(f"**Notiz:** {row['notiz']}")
                 st.caption(f"Erfasst am {row['erfasst_am']}")
 
-                if st.button("🗑️ Löschen", key=f"del_{row['id']}"):
+                if st.button("[ x ] Löschen", key=f"del_{row['id']}"):
                     df_all = load_entries()
                     df_all = df_all[df_all["id"] != row["id"]]
                     save_entries(df_all)
@@ -358,7 +370,7 @@ with tab_my:
         export = mine[["datum","projekt","start","ende","stunden","notiz"]].copy()
         export.columns = ["Datum","Projekt","Start","Ende","Stunden","Notiz"]
         csv = export.to_csv(index=False, sep=";").encode("utf-8-sig")
-        st.download_button("⬇️ Meine Einträge exportieren (CSV)", csv,
+        st.download_button("[ v ] Meine Einträge exportieren (CSV)", csv,
                            f"zeit_{person}_{date.today()}.csv", "text/csv")
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -390,7 +402,7 @@ with tab_overview:
             st.markdown("---")
 
             # Pro Projekt
-            st.markdown("#### ⏱️ Stunden pro Projekt")
+            st.markdown("#### Stunden pro Projekt")
             proj_sum = (
                 filtered.groupby("projekt")["stunden_num"]
                 .sum()
@@ -409,7 +421,7 @@ with tab_overview:
             st.markdown("---")
 
             # Pro Person pro Projekt
-            st.markdown("#### 👥 Stunden pro Person & Projekt")
+            st.markdown("#### Stunden pro Person & Projekt")
             pivot = (
                 filtered.groupby(["person","projekt"])["stunden_num"]
                 .sum()
@@ -424,7 +436,7 @@ with tab_overview:
             export_all = filtered[["datum","person","projekt","start","ende","stunden","notiz"]].copy()
             export_all.columns = ["Datum","Person","Projekt","Start","Ende","Stunden","Notiz"]
             csv_all = export_all.to_csv(index=False, sep=";").encode("utf-8-sig")
-            st.download_button("⬇️ Alle Einträge exportieren (CSV)", csv_all,
+            st.download_button("[ v ] Alle Einträge exportieren (CSV)", csv_all,
                                f"zeiterfassung_export_{date.today()}.csv", "text/csv")
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -437,9 +449,9 @@ with tab_projects:
     st.markdown("**Bestehende Projekte:**")
     for p in projects:
         col_p, col_d = st.columns([4, 1])
-        col_p.write(f"📁 {p}")
+        col_p.write(f"[ - ] {p}")
         if p != "Allgemein":
-            if col_d.button("🗑️", key=f"dproj_{p}", help=f"{p} löschen"):
+            if col_d.button("[ x ]", key=f"dproj_{p}", help=f"{p} löschen"):
                 projects.remove(p)
                 save_projects(projects)
                 st.success(f"Projekt '{p}' gelöscht.")
@@ -449,7 +461,7 @@ with tab_projects:
     st.markdown("**Neues Projekt erstellen:**")
     with st.form("new_project", clear_on_submit=True):
         new_proj = st.text_input("Projektname", placeholder="z.B. Website Relaunch")
-        if st.form_submit_button("➕ Projekt hinzufügen", type="primary"):
+        if st.form_submit_button("[ + ] Projekt hinzufügen", type="primary"):
             if not new_proj.strip():
                 st.error("Bitte einen Projektnamen eingeben.")
             elif new_proj.strip() in projects:
@@ -460,4 +472,4 @@ with tab_projects:
                 st.success(f"Projekt '{new_proj.strip()}' erstellt!")
                 st.rerun()
 
-st.markdown('<div class="wm-footer"><strong>WALTER MEIER</strong> · Zeiterfassung</div>', unsafe_allow_html=True)
+st.markdown('<div class="wm-footer"><strong>WALTER MEIER</strong> <em>Fertigungslösungen AG</em> · Zeiterfassung</div>', unsafe_allow_html=True)
