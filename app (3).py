@@ -4,7 +4,7 @@ import os
 import json
 from datetime import date, datetime, timedelta
 
-st.set_page_config(page_title="Walter Meier – Zeiterfassung", page_icon="⏱️", layout="centered")
+st.set_page_config(page_title="Walter Meier (Fertigungslösungen) AG – Zeiterfassung", page_icon="⏱️", layout="centered")
 
 # Walter Meier Corporate Design
 # Primärfarben: Schwarz #1a1a1a, Lime-Grün #C4D600, Akzentgrün #8BBD00
