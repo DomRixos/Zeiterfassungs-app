@@ -54,7 +54,11 @@ st.markdown("""
 
     /* Primary button → WM Lime Green */
     div.stButton > button[kind="primary"],
-    div.stFormSubmitButton > button[kind="primary"] {
+    div.stButton > button[data-testid="baseButton-primary"],
+    div.stFormSubmitButton > button[kind="primary"],
+    div.stFormSubmitButton > button[data-testid="baseButton-primary"],
+    button[kind="primary"],
+    button[data-testid="baseButton-primary"] {
         background-color: #C4D600 !important;
         color: #1a1a1a !important;
         border: none !important;
@@ -63,7 +67,10 @@ st.markdown("""
         letter-spacing: 0.3px;
     }
     div.stButton > button[kind="primary"]:hover,
-    div.stFormSubmitButton > button[kind="primary"]:hover {
+    div.stButton > button[data-testid="baseButton-primary"]:hover,
+    div.stFormSubmitButton > button[kind="primary"]:hover,
+    div.stFormSubmitButton > button[data-testid="baseButton-primary"]:hover,
+    button[data-testid="baseButton-primary"]:hover {
         background-color: #a8b800 !important;
         color: #1a1a1a !important;
     }
