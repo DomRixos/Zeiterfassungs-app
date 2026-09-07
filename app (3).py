@@ -35,9 +35,9 @@ st.markdown("""
     }
     .wm-tagline {
         color: #C4D600;
-        font-size: 0.72rem;
-        font-weight: 400;
-        letter-spacing: 0.5px;
+        font-size: inherit;
+        font-weight: inherit;
+        letter-spacing: inherit;
         opacity: 0.85;
         display: inline;
     }
