@@ -116,10 +116,74 @@ st.markdown("""
     /* Form */
     div[data-testid="stForm"] { border: none; padding: 0; }
 
-    /* Selectbox / inputs accent */
-    div[data-baseweb="select"] > div:first-child:focus-within {
-        border-color: #C4D600 !important;
+    /* Input fields */
+    input[type="text"], input[type="email"], input[type="number"], textarea {
+        border: 1.5px solid #d0d0d0 !important;
+        border-radius: 4px !important;
+        font-family: 'Inter', sans-serif !important;
+        transition: border-color 0.15s !important;
     }
+    input:focus, textarea:focus {
+        border-color: #C4D600 !important;
+        box-shadow: 0 0 0 2px rgba(196,214,0,0.18) !important;
+        outline: none !important;
+    }
+
+    /* Number input step buttons */
+    button[data-testid="stNumberInputStepUp"],
+    button[data-testid="stNumberInputStepDown"] {
+        background-color: #1a1a1a !important;
+        color: #C4D600 !important;
+        border: none !important;
+        border-radius: 3px !important;
+    }
+    button[data-testid="stNumberInputStepUp"]:hover,
+    button[data-testid="stNumberInputStepDown"]:hover {
+        background-color: #C4D600 !important;
+        color: #1a1a1a !important;
+    }
+
+    /* Selectbox */
+    div[data-baseweb="select"] > div {
+        border: 1.5px solid #d0d0d0 !important;
+        border-radius: 4px !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    div[data-baseweb="select"] > div:focus-within {
+        border-color: #C4D600 !important;
+        box-shadow: 0 0 0 2px rgba(196,214,0,0.18) !important;
+    }
+
+    /* Date input */
+    div[data-testid="stDateInput"] input {
+        border: 1.5px solid #d0d0d0 !important;
+        border-radius: 4px !important;
+    }
+    div[data-testid="stDateInput"] input:focus {
+        border-color: #C4D600 !important;
+        box-shadow: 0 0 0 2px rgba(196,214,0,0.18) !important;
+    }
+
+    /* Field labels uppercase like WM website */
+    label[data-testid="stWidgetLabel"] p,
+    div[data-testid="stWidgetLabel"] p {
+        font-weight: 600 !important;
+        font-size: 0.78rem !important;
+        color: #444 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    /* Footer */
+    .wm-footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 2px solid #C4D600;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #aaa;
+    }
+    .wm-footer strong { color: #1a1a1a; }
 </style>
 
 <div class="wm-header">
@@ -395,3 +459,5 @@ with tab_projects:
                 save_projects(projects)
                 st.success(f"Projekt '{new_proj.strip()}' erstellt!")
                 st.rerun()
+
+st.markdown('<div class="wm-footer"><strong>WALTER MEIER</strong> · Zeiterfassung</div>', unsafe_allow_html=True)
