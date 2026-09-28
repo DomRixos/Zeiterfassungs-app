@@ -1,3 +1,303 @@
+ import streamlit as st
+import pandas as pd
+import os
+import json
+import hashlib
+from datetime import date, datetime, timedelta
+
+st.set_page_config(page_title="Walter Meier – Zeiterfassung", page_icon=None, layout="centered")
+
+st.markdown("""
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+    html, body, [class*="css"] {
+        font-family: 'Inter', sans-serif;
+    }
+
+    .wm-header {
+        background: #1a1a1a;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 1.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .wm-logo {
+        font-size: 1.4rem;
+        font-weight: 800;
+        color: #C4D600;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+    .wm-subtitle {
+        color: #999;
+        font-size: 0.85rem;
+        font-weight: 400;
+    }
+
+    h1 { color: #1a1a1a !important; font-weight: 800 !important; }
+    h2, h3 { color: #1a1a1a !important; font-weight: 700 !important; }
+
+    div[data-testid="stButton"] button,
+    div[data-testid="stFormSubmitButton"] button {
+        background-color: #C4D600 !important;
+        color: #1a1a1a !important;
+        border: none !important;
+        font-weight: 700 !important;
+        border-radius: 4px !important;
+    }
+    div[data-testid="stButton"] button:hover,
+    div[data-testid="stFormSubmitButton"] button:hover {
+        background-color: #a8b800 !important;
+        color: #1a1a1a !important;
+    }
+
+    div.stDownloadButton > button {
+        background-color: #1a1a1a !important;
+        color: #C4D600 !important;
+        border: 2px solid #C4D600 !important;
+        border-radius: 4px !important;
+        font-weight: 600 !important;
+    }
+    div.stDownloadButton > button:hover {
+        background-color: #333 !important;
+    }
+
+    div[data-testid="stTabs"] button[role="tab"],
+    div[data-testid="stTabs"] button[role="tab"] span,
+    div[data-testid="stTabs"] button[role="tab"] p {
+        color: #C4D600 !important;
+        font-weight: 500 !important;
+    }
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"],
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] span,
+    div[data-testid="stTabs"] button[role="tab"][aria-selected="true"] p {
+        color: #C4D600 !important;
+        border-bottom-color: #C4D600 !important;
+        font-weight: 700 !important;
+    }
+
+    div[data-testid="stMetric"] {
+        background: #f9fbe7;
+        border-left: 4px solid #C4D600;
+        border-radius: 4px;
+        padding: 0.75rem 1rem;
+    }
+    div[data-testid="stMetricLabel"] { color: #555 !important; font-weight: 600 !important; }
+    div[data-testid="stMetricValue"] { color: #1a1a1a !important; font-weight: 800 !important; }
+
+    div[data-testid="stExpander"] {
+        border: 1px solid #e0e0e0 !important;
+        border-radius: 4px !important;
+        border-left: 3px solid #C4D600 !important;
+    }
+
+    div[data-testid="stAlert"] { border-radius: 4px !important; }
+    div[data-testid="stForm"] { border: none; padding: 0; }
+
+    input[type="text"], input[type="email"], input[type="number"],
+    input[type="password"], textarea {
+        border: 1.5px solid #d0d0d0 !important;
+        border-radius: 4px !important;
+        font-family: 'Inter', sans-serif !important;
+        transition: border-color 0.15s !important;
+    }
+    input:focus, textarea:focus {
+        border-color: #C4D600 !important;
+        box-shadow: 0 0 0 2px rgba(196,214,0,0.18) !important;
+        outline: none !important;
+    }
+
+    button[data-testid="stNumberInputStepUp"],
+    button[data-testid="stNumberInputStepDown"] {
+        background-color: #1a1a1a !important;
+        color: #C4D600 !important;
+        border: none !important;
+        border-radius: 3px !important;
+    }
+
+    div[data-baseweb="select"] > div {
+        border: 1.5px solid #d0d0d0 !important;
+        border-radius: 4px !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    div[data-baseweb="select"] > div:focus-within {
+        border-color: #C4D600 !important;
+        box-shadow: 0 0 0 2px rgba(196,214,0,0.18) !important;
+    }
+
+    div[data-testid="stDateInput"] input {
+        border: 1.5px solid #d0d0d0 !important;
+        border-radius: 4px !important;
+    }
+    div[data-testid="stDateInput"] input:focus {
+        border-color: #C4D600 !important;
+        box-shadow: 0 0 0 2px rgba(196,214,0,0.18) !important;
+    }
+
+    label[data-testid="stWidgetLabel"] p,
+    div[data-testid="stWidgetLabel"] p {
+        font-weight: 600 !important;
+        font-size: 0.78rem !important;
+        color: #444 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.5px !important;
+    }
+
+    .wm-footer {
+        margin-top: 3rem;
+        padding-top: 1rem;
+        border-top: 2px solid #C4D600;
+        text-align: center;
+        font-size: 0.75rem;
+        color: #aaa;
+    }
+    .wm-footer strong { color: #1a1a1a; }
+</style>
+
+<div class="wm-header">
+  <div class="wm-logo">WALTER MEIER</div>
+  <div class="wm-subtitle">Zeiterfassung</div>
+</div>
+""", unsafe_allow_html=True)
+
+# ── Dateien ───────────────────────────────────────────────────────────────────
+ENTRIES_FILE   = "zeiterfassung_eintraege.csv"
+PROJECTS_FILE  = "zeiterfassung_projekte.json"
+PASSWORDS_FILE = "zeiterfassung_passwords.json"
+
+ENTRY_COLS = ["id", "person", "projekt", "datum", "start", "ende", "stunden", "notiz", "erfasst_am"]
+DEFAULT_PROJECTS = ["Meeting", "Tasks", "Workshop"]
+
+def load_entries() -> pd.DataFrame:
+    if os.path.exists(ENTRIES_FILE):
+        df = pd.read_csv(ENTRIES_FILE, dtype=str)
+        for c in ENTRY_COLS:
+            if c not in df.columns:
+                df[c] = ""
+        return df[ENTRY_COLS]
+    return pd.DataFrame(columns=ENTRY_COLS)
+
+def save_entries(df: pd.DataFrame):
+    df.to_csv(ENTRIES_FILE, index=False)
+
+def load_projects() -> list:
+    if os.path.exists(PROJECTS_FILE):
+        with open(PROJECTS_FILE) as f:
+            return json.load(f)
+    return DEFAULT_PROJECTS.copy()
+
+def save_projects(projects: list):
+    with open(PROJECTS_FILE, "w") as f:
+        json.dump(projects, f)
+
+def load_passwords() -> dict:
+    if os.path.exists(PASSWORDS_FILE):
+        with open(PASSWORDS_FILE) as f:
+            return json.load(f)
+    return {}
+
+def save_passwords(passwords: dict):
+    with open(PASSWORDS_FILE, "w") as f:
+        json.dump(passwords, f)
+
+def hash_pw(pw: str) -> str:
+    return hashlib.sha256(pw.encode()).hexdigest()
+
+def next_id(df: pd.DataFrame) -> str:
+    if df.empty:
+        return "1"
+    return str(int(df["id"].astype(int).max()) + 1)
+
+def float_to_hhmm(h: float) -> str:
+    hours = int(h)
+    minutes = round((h - hours) * 60)
+    return f"{hours}h {minutes:02d}m"
+
+# ── Session state ─────────────────────────────────────────────────────────────
+for key in ["person", "authenticated"]:
+    if key not in st.session_state:
+        st.session_state[key] = "" if key == "person" else False
+
+# ── Login / Passwort ──────────────────────────────────────────────────────────
+st.title("Zeiterfassung")
+
+if not st.session_state.person or not st.session_state.authenticated:
+    passwords = load_passwords()
+
+    with st.form("login_form"):
+        st.markdown("**Anmelden**")
+        name_input = st.text_input("Name", placeholder="Max Mustermann")
+        pw_input   = st.text_input("Passwort", type="password")
+        submitted  = st.form_submit_button("[ > ] Anmelden", use_container_width=True)
+
+    if submitted:
+        name = name_input.strip()
+        pw   = pw_input.strip()
+        if not name:
+            st.error("Bitte Namen eingeben.")
+        elif not pw:
+            st.error("Bitte Passwort eingeben.")
+        elif name not in passwords:
+            # Erstes Login: Passwort setzen
+            passwords[name] = hash_pw(pw)
+            save_passwords(passwords)
+            st.session_state.person = name
+            st.session_state.authenticated = True
+            st.success(f"Willkommen {name}! Passwort wurde gesetzt.")
+            st.rerun()
+        elif passwords[name] == hash_pw(pw):
+            st.session_state.person = name
+            st.session_state.authenticated = True
+            st.rerun()
+        else:
+            st.error("Falsches Passwort.")
+
+    st.caption("Erster Login: Passwort wird automatisch gesetzt.")
+    st.stop()
+
+person   = st.session_state.person
+projects = load_projects()
+
+col_title, col_logout = st.columns([6, 1])
+col_title.caption(f"Eingeloggt als **{person}**")
+if col_logout.button("Logout"):
+    st.session_state.person = ""
+    st.session_state.authenticated = False
+    st.rerun()
+
+# ── Tabs ──────────────────────────────────────────────────────────────────────
+tab_new, tab_my, tab_overview, tab_projects = st.tabs([
+    "+ Zeit erfassen",
+    "= Meine Einträge",
+    "~ Auswertung",
+    "# Projekte"
+])
+
+# ══════════════════════════════════════════════════════════════════════════════
+# TAB 1 – ZEIT ERFASSEN
+# ══════════════════════════════════════════════════════════════════════════════
+with tab_new:
+    st.subheader("Neue Zeit erfassen")
+
+    with st.form("new_entry", clear_on_submit=True):
+        projekt = st.selectbox("Projekt *", projects)
+        datum   = st.date_input("Datum *", value=date.today())
+
+        col1, col2 = st.columns(2)
+        start_h = col1.number_input("Start – Stunde", min_value=0, max_value=23, value=8)
+        start_m = col1.number_input("Start – Minute", min_value=0, max_value=59, value=0, step=15)
+        ende_h  = col2.number_input("Ende – Stunde",  min_value=0, max_value=23, value=17)
+        ende_m  = col2.number_input("Ende – Minute",  min_value=0, max_value=59, value=0, step=15)
+
+        notiz     = st.text_input("Notiz (optional)", placeholder="Was habe ich gemacht?")
+        submitted = st.form_submit_button("[ + ] Zeit speichern", use_container_width=True)
+
+    if submitted:
+        start_str = f"{start_h:02d}:{start_m:02d}"
+        ende_str  = f"{ende_h:02d}:{ende_m:02d}"
         start_dt  = datetime.strptime(start_str, "%H:%M")
         ende_dt   = datetime.strptime(ende_str,  "%H:%M")
 
@@ -198,3 +498,5 @@ with tab_projects:
                 save_passwords(passwords)
                 st.success("Passwort erfolgreich geändert.")
 
+st.markdown('<div class="wm-footer"><strong>WALTER MEIER</strong> · Zeiterfassung</div>', unsafe_allow_html=True)
+       
